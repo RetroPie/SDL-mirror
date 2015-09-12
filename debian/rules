@@ -6,7 +6,7 @@ DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 confflags = --disable-rpath --disable-video-directfb \
             --disable-nas --disable-esd --disable-arts \
             --disable-alsa-shared --disable-pulseaudio-shared \
-            --disable-x11-shared
+            --disable-x11-shared --host=armv6l-raspberry-linux-gnueabihf --disable-video-opengl --enable-video-gles --disable-esd --disable-pulseaudio
 
 %:
 	dh $@ --parallel
