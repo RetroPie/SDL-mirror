@@ -8,6 +8,7 @@ confflags = --disable-rpath --disable-video-directfb \
             --disable-alsa-shared --disable-pulseaudio-shared \
             --disable-x11-shared  --disable-video-opengl --enable-video-gles \
             --disable-esd --disable-pulseaudio \
+            --disable-input-tslib \
             --host=armv6l-raspberry-linux-gnueabihf
 
 %:
