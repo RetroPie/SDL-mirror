@@ -459,7 +459,7 @@ ConfigJoystick(SDL_Joystick * joystick, int fd)
                 ++joystick->nbuttons;
             }
         }
-        for (i = 0; i < ABS_MAX; ++i) {
+        for (i = 0; i < ABS_MISC; ++i) {
             /* Skip hats */
             if (i == ABS_HAT0X) {
                 i = ABS_HAT3Y;
@@ -720,6 +720,10 @@ HandleInputEvents(SDL_Joystick * joystick)
                 }
                 break;
             case EV_ABS:
+                if (code >= ABS_MISC) {
+                    break;
+                }
+
                 switch (code) {
                 case ABS_HAT0X:
                 case ABS_HAT0Y:
