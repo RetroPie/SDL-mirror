@@ -31,6 +31,7 @@
  */
 
 /* SDL internals */
+#include "SDL_hints.h"
 #include "../SDL_sysvideo.h"
 #include "SDL_version.h"
 #include "SDL_syswm.h"
@@ -214,6 +215,7 @@ RPI_SetDisplayMode(_THIS, SDL_VideoDisplay * display, SDL_DisplayMode * mode)
 int
 RPI_CreateWindow(_THIS, SDL_Window * window)
 {
+    const char *hint = SDL_GetHint(SDL_HINT_RPI_STRETCH_WINDOW);
     SDL_WindowData *wdata;
     SDL_VideoDisplay *display;
     SDL_DisplayData *displaydata;
@@ -235,23 +237,44 @@ RPI_CreateWindow(_THIS, SDL_Window * window)
     display = SDL_GetDisplayForWindow(window);
     displaydata = (SDL_DisplayData *) display->driverdata;
 
-    /* Windows have one size for now */
-    window->w = display->desktop_mode.w;
-    window->h = display->desktop_mode.h;
-
-    /* OpenGL ES is the law here, buddy */
-    window->flags |= SDL_WINDOW_OPENGL;
-
     /* Create a dispman element and associate a window to it */
-    dst_rect.x = 0;
-    dst_rect.y = 0;
-    dst_rect.width = window->w;
-    dst_rect.height = window->h;
+    if ((hint == NULL)) {
+        /* Fullscreen mode. */
+        /* Calculate source and destination aspect ratios. */
+        float srcAspect = (float)window->w / (float)window->h;
+        float dstAspect = (float)display->desktop_mode.w / (float)display->desktop_mode.h;
+        /* If source and destination aspect ratios are not equal correct destination width. */
+        if (srcAspect < dstAspect) {
+            dst_rect.width = (unsigned)(display->desktop_mode.h * srcAspect);
+            dst_rect.height = display->desktop_mode.h;
+        }
+        else if (srcAspect > dstAspect) {
+            dst_rect.width = display->desktop_mode.w;
+            dst_rect.height = (unsigned)((float)display->desktop_mode.w / srcAspect);
+        }
+        else {
+            dst_rect.width = display->desktop_mode.w;
+            dst_rect.height = display->desktop_mode.h;
+        }
+        /* Center window. */
+        dst_rect.x = (display->desktop_mode.w - dst_rect.width) / 2;
+        dst_rect.y = (display->desktop_mode.h - dst_rect.height) / 2;
+    }
+    else {
+        /* Fullscreen streched mode. */
+        dst_rect.x = 0;
+        dst_rect.y = 0;
+        dst_rect.width = display->desktop_mode.w;
+        dst_rect.height = display->desktop_mode.h;
+    }
 
     src_rect.x = 0;
     src_rect.y = 0;
     src_rect.width = window->w << 16;
     src_rect.height = window->h << 16;
+    
+    /* OpenGL ES is the law here, buddy */
+    window->flags |= SDL_WINDOW_OPENGL;
 
     dispman_update = vc_dispmanx_update_start( 0 );
     wdata->dispman_window.element = vc_dispmanx_element_add ( dispman_update, displaydata->dispman_display, SDL_RPI_VIDEOLAYER /* layer */, &dst_rect, 0/*src*/, &src_rect, DISPMANX_PROTECTION_NONE, &dispman_alpha /*alpha*/, 0/*clamp*/, 0/*transform*/);

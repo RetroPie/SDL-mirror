@@ -622,6 +622,14 @@ extern "C" {
 #define SDL_HINT_NO_SIGNAL_HANDLERS   "SDL_NO_SIGNAL_HANDLERS"
 
 /**
+ *  \brief Tell dispmanx to stretch the SDL window to fill the display.
+ *
+ * This hint only applies to the rpi video driver.
+ *
+ */
+#define SDL_HINT_RPI_STRETCH_WINDOW    "SDL_HINT_RPI_STRETCH_WINDOW"
+
+/**
  *  \brief Tell SDL not to generate window-close events for Alt+F4 on Windows.
  *
  * The variable can be set to the following values:
