@@ -626,8 +626,14 @@ extern "C" {
  *
  * This hint only applies to the rpi video driver.
  *
+ * The variable can be set to the following values:
+ *   "0"       - Window resolution is desktop resolution.
+ *               This is the behaviour of SDL <= 2.0.4. (default)
+ *   "1"       - Requested video resolution will be scaled to desktop resolution.
+ *               Aspect ratio of requested video resolution will be respected.
+ *   "2"       - Requested video resolution will be scaled to desktop resolution.
  */
-#define SDL_HINT_RPI_STRETCH_WINDOW    "SDL_HINT_RPI_STRETCH_WINDOW"
+#define SDL_HINT_VIDEO_RPI_SCALE_MODE    "SDL_VIDEO_RPI_SCALE_MODE"
 
 /**
  *  \brief Tell SDL not to generate window-close events for Alt+F4 on Windows.

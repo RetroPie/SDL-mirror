@@ -215,7 +215,8 @@ RPI_SetDisplayMode(_THIS, SDL_VideoDisplay * display, SDL_DisplayMode * mode)
 int
 RPI_CreateWindow(_THIS, SDL_Window * window)
 {
-    const char *hint = SDL_GetHint(SDL_HINT_RPI_STRETCH_WINDOW);
+    const char *hint = SDL_GetHint(SDL_HINT_VIDEO_RPI_SCALE_MODE);
+    char scalemode = '0';
     SDL_WindowData *wdata;
     SDL_VideoDisplay *display;
     SDL_DisplayData *displaydata;
@@ -237,35 +238,53 @@ RPI_CreateWindow(_THIS, SDL_Window * window)
     display = SDL_GetDisplayForWindow(window);
     displaydata = (SDL_DisplayData *) display->driverdata;
 
+    float srcAspect = 1; 
+    float dstAspect = 1;
+
+    if (hint != NULL)
+        scalemode = *hint;
+
     /* Create a dispman element and associate a window to it */
-    if ((hint == NULL)) {
-        /* Fullscreen mode. */
-        /* Calculate source and destination aspect ratios. */
-        float srcAspect = (float)window->w / (float)window->h;
-        float dstAspect = (float)display->desktop_mode.w / (float)display->desktop_mode.h;
-        /* If source and destination aspect ratios are not equal correct destination width. */
-        if (srcAspect < dstAspect) {
-            dst_rect.width = (unsigned)(display->desktop_mode.h * srcAspect);
-            dst_rect.height = display->desktop_mode.h;
-        }
-        else if (srcAspect > dstAspect) {
+    switch(scalemode) {
+        case '1':
+            /* Fullscreen mode. */
+            /* Calculate source and destination aspect ratios. */
+            srcAspect = (float)window->w / (float)window->h;
+            dstAspect = (float)display->desktop_mode.w / (float)display->desktop_mode.h;
+            /* If source and destination aspect ratios are not equal correct destination width. */
+            if (srcAspect < dstAspect) {
+                dst_rect.width = (unsigned)(display->desktop_mode.h * srcAspect);
+                dst_rect.height = display->desktop_mode.h;
+            }
+            else if (srcAspect > dstAspect) {
+                dst_rect.width = display->desktop_mode.w;
+                dst_rect.height = (unsigned)((float)display->desktop_mode.w / srcAspect);
+            }
+            else {
+                dst_rect.width = display->desktop_mode.w;
+                dst_rect.height = display->desktop_mode.h;
+            }
+            /* Center window. */
+            dst_rect.x = (display->desktop_mode.w - dst_rect.width) / 2;
+            dst_rect.y = (display->desktop_mode.h - dst_rect.height) / 2;
+            break;
+        case '2':
+            /* Fullscreen streched mode. */
+            dst_rect.x = 0;
+            dst_rect.y = 0;
             dst_rect.width = display->desktop_mode.w;
-            dst_rect.height = (unsigned)((float)display->desktop_mode.w / srcAspect);
-        }
-        else {
-            dst_rect.width = display->desktop_mode.w;
             dst_rect.height = display->desktop_mode.h;
-        }
-        /* Center window. */
-        dst_rect.x = (display->desktop_mode.w - dst_rect.width) / 2;
-        dst_rect.y = (display->desktop_mode.h - dst_rect.height) / 2;
-    }
-    else {
-        /* Fullscreen streched mode. */
-        dst_rect.x = 0;
-        dst_rect.y = 0;
-        dst_rect.width = display->desktop_mode.w;
-        dst_rect.height = display->desktop_mode.h;
+            break;
+        default:
+            /* Default mode. */
+            window->w = display->desktop_mode.w;
+            window->h = display->desktop_mode.h;
+
+            dst_rect.x = 0;
+            dst_rect.y = 0;
+            dst_rect.width = window->w;
+            dst_rect.height = window->h;
+            break;
     }
 
     src_rect.x = 0;
