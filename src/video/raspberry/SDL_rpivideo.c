@@ -215,7 +215,8 @@ RPI_SetDisplayMode(_THIS, SDL_VideoDisplay * display, SDL_DisplayMode * mode)
 int
 RPI_CreateWindow(_THIS, SDL_Window * window)
 {
-    const char *hint = SDL_GetHint(SDL_HINT_VIDEO_RPI_SCALE_MODE);
+    const char *hintScale = SDL_GetHint(SDL_HINT_VIDEO_RPI_SCALE_MODE);
+    const char *hintRatio = SDL_GetHint(SDL_HINT_VIDEO_RPI_RATIO);
     char scalemode = '0';
     SDL_WindowData *wdata;
     SDL_VideoDisplay *display;
@@ -241,15 +242,21 @@ RPI_CreateWindow(_THIS, SDL_Window * window)
     float srcAspect = 1; 
     float dstAspect = 1;
 
-    if (hint != NULL)
-        scalemode = *hint;
+    if (hintScale != NULL)
+        scalemode = *hintScale;
 
     /* Create a dispman element and associate a window to it */
     switch(scalemode) {
         case '1':
             /* Fullscreen mode. */
             /* Calculate source and destination aspect ratios. */
-            srcAspect = (float)window->w / (float)window->h;
+            if (hintRatio != NULL) 
+                srcAspect = strtof(hintRatio, NULL);
+            else
+                srcAspect = (float)window->w / (float)window->h; 
+            /* only allow sensible aspect ratios */
+            if (srcAspect < 0.2f || srcAspect > 6.0f)
+                srcAspect = (float)window->w / (float)window->h;
             dstAspect = (float)display->desktop_mode.w / (float)display->desktop_mode.h;
             /* If source and destination aspect ratios are not equal correct destination width. */
             if (srcAspect < dstAspect) {
