@@ -671,11 +671,15 @@ extern "C" {
  *   "1"       - Requested video resolution will be scaled to desktop resolution.
  *               Aspect ratio of requested video resolution will be respected.
  *   "2"       - Requested video resolution will be scaled to desktop resolution.
+ *   "3"       - Requested video resolution will be scaled to desktop resolution.
+ *               Aspect ratio of requested video resolution will be respected.
+ *               If possible output resolution will be integral multiple of video
+ *               resolution.
  */
 #define SDL_HINT_VIDEO_RPI_SCALE_MODE    "SDL_VIDEO_RPI_SCALE_MODE"
 
 /**
- *  \brief Tell dispmanx to set an specific aspect ratio.
+ *  \brief Tell dispmanx to set a specific aspect ratio.
  *
  * This hint only applies to the rpi video driver.
  *

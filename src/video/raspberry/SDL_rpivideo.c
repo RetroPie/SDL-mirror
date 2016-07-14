@@ -244,12 +244,33 @@ RPI_CreateWindow(_THIS, SDL_Window * window)
 
     float srcAspect = 1; 
     float dstAspect = 1;
+    int factor_x = 0;
+    int factor_y = 0;
 
     if (hintScale != NULL)
         scalemode = *hintScale;
 
     /* Create a dispman element and associate a window to it */
     switch(scalemode) {
+        case '3':
+            /* Pixel perfect scaling mode. */
+            factor_x = (display->desktop_mode.w / window->w);
+            factor_y = (display->desktop_mode.h / window->h);
+            if ((factor_x != 0) && (factor_y != 0)) {
+                if (factor_x >= factor_y) {
+                    dst_rect.width = window->w * factor_y;
+                    dst_rect.height = window->h * factor_y;
+                }
+                else {
+                    dst_rect.width = window->w * factor_x;
+                    dst_rect.height = window->h * factor_x;
+                }
+                /* Center window. */
+                dst_rect.x = (display->desktop_mode.w - dst_rect.width) / 2;
+                dst_rect.y = (display->desktop_mode.h - dst_rect.height) / 2;
+                break;
+            }
+            /* If integer scale is not possible fallback to mode 1. */
         case '1':
             /* Fullscreen mode. */
             /* Calculate source and destination aspect ratios. */
