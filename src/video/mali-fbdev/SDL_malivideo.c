@@ -119,17 +119,19 @@ MALI_VideoInit(_THIS)
     SDL_VideoDisplay display;
     SDL_DisplayMode current_mode;
     SDL_DisplayData *data;
+    struct fb_var_screeninfo vinfo;
+    int fd;
 
     data = (SDL_DisplayData *) SDL_calloc(1, sizeof(SDL_DisplayData));
     if (data == NULL) {
         return SDL_OutOfMemory();
     }
 
-    int fd = open("/dev/fb0", O_RDWR, 0);
+    fd = open("/dev/fb0", O_RDWR, 0);
     if (fd < 0) {
         return SDL_SetError("mali-fbdev: Could not open framebuffer device");
     }
-    struct fb_var_screeninfo vinfo;
+
     if (ioctl(fd, FBIOGET_VSCREENINFO, &vinfo) < 0) {
         MALI_VideoQuit(_this);
         return SDL_SetError("mali-fbdev: Could not get framebuffer information");
