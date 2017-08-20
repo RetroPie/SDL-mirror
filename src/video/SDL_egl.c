@@ -40,10 +40,10 @@
 
 #if SDL_VIDEO_DRIVER_RPI
 /* Raspbian places the OpenGL ES/EGL binaries in a non standard path */
-#define DEFAULT_EGL "/opt/vc/lib/libEGL.so"
-#define DEFAULT_OGL_ES2 "/opt/vc/lib/libGLESv2.so"
-#define DEFAULT_OGL_ES_PVR "/opt/vc/lib/libGLES_CM.so"
-#define DEFAULT_OGL_ES "/opt/vc/lib/libGLESv1_CM.so"
+#define DEFAULT_EGL "/opt/vc/lib/libbrcmEGL.so"
+#define DEFAULT_OGL_ES2 "/opt/vc/lib/libbrcmGLESv2.so"
+#define DEFAULT_OGL_ES_PVR "/opt/vc/lib/libbrcmGLESv2.so"
+#define DEFAULT_OGL_ES "/opt/vc/lib/libbrcmGLESv2.so"
 
 #elif SDL_VIDEO_DRIVER_ANDROID || SDL_VIDEO_DRIVER_VIVANTE
 /* Android */
