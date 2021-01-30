@@ -22,7 +22,7 @@ confflags = --disable-rpath --disable-video-directfb \
 #confflags += --disable-x11-shared
 
 %:
-	dh $@ --parallel
+	dh $@ --without autoreconf
 
 override_dh_auto_configure:
 	dh_auto_configure -Bbuilddir/all -- $(confflags)
@@ -39,7 +39,10 @@ override_dh_auto_clean:
 	rm -f debian/examples.tar.gz
 
 override_dh_install:
-	dh_install --remaining-packages --fail-missing -XlibSDL2.la
+	dh_install --remaining-packages
+
+override_dh_missing:
+	dh_missing --fail-missing -XlibSDL2.la
 
 override_dh_installexamples:
 	dh_installexamples -plibsdl2-dev debian/examples.tar.gz
